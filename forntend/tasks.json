@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "title": "Link CSS file to HTML",
+        "priority": "high",
+        "status": "done"
+    },
+    {
+        "id": 2,
+        "title": "Create a new HTML file",
+        "priority": "medium",
+        "status": "done"
+    },
+    {
+        "id": 3,
+        "title": "Update JavaScript functionality",
+        "priority": "low",
+        "status": "pending"
+    }
+]
