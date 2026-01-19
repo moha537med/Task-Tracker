@@ -48,7 +48,7 @@ app.get('/tasks', async (req, res) => {
 
 
 
-// POST endpoint to add a new task step 5 backend
+// POST endpoint to add a new task
 app.post("/tasks", async (req,res) => {
     try{
         let newTask = req.body;
