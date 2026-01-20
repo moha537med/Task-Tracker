@@ -6,11 +6,11 @@ const taskList = document.getElementById('task-list');
 const filterSpans = document.querySelectorAll('#filter .filter-type span');
 const sortSelect = document.getElementById('sort');
 
-
-
 let allTasks = [];
-
 let isLoading = false;
+
+// current filter state
+let currentFilter = 'all';
 
 // create li element for a new task
 function createTaskElement(task) {
@@ -21,6 +21,7 @@ function createTaskElement(task) {
         <span>${task.title}</span>
         <span class="task-priority">${task.priority}</span>
     `;
+
     // toggle task status when click on task
     li.addEventListener('click', async () => {
         const status = task.status === 'pending' ? 'done' : 'pending';
@@ -34,7 +35,7 @@ function createTaskElement(task) {
                 })
             });
 
-            await fetchTasks();
+            await fetchTasks(sortSelect.value);
         } catch (error) {
             console.error("Failed to update task status");
         }
@@ -42,7 +43,6 @@ function createTaskElement(task) {
 
     return li;
 }
-
 
 // function to fetch my tasks from the backend
 async function fetchTasks(sortType = '') {
@@ -54,13 +54,12 @@ async function fetchTasks(sortType = '') {
         allTasks = await response.json();
 
         isLoading = false;
-        renderTasks(allTasks);
+        applyFilterAndRender();
     } catch (error) {
         isLoading = false;
         taskList.innerHTML = '<li class="error">Failed to load tasks</li>';
     }
 }
-
 
 // function to render tasks
 function renderTasks(tasks) {
@@ -71,6 +70,17 @@ function renderTasks(tasks) {
     });
 }
 
+// filter then render
+function applyFilterAndRender() {
+    const filteredTasks =
+        currentFilter === 'all'
+            ? allTasks
+            : allTasks.filter(task => task.status === currentFilter);
+
+    renderTasks(filteredTasks);
+}
+
+// initial fetch
 fetchTasks();
 
 // add new task 
@@ -97,7 +107,7 @@ addButton.addEventListener('click', (e) => {
     .then(res => res.json())
     .then(() => {
         isLoading = false;
-        fetchTasks();
+        fetchTasks(sortSelect.value);
     })
     .catch(err => {
         isLoading = false;
@@ -112,27 +122,13 @@ sortSelect.addEventListener('change', () => {
     fetchTasks(sortSelect.value);
 });
 
-
-
 // filter tasks
 filterSpans.forEach(span => {
     span.addEventListener('click', () => {
         filterSpans.forEach(s => s.classList.remove('active'));
         span.classList.add('active');
-        const filter = span.dataset.content;
 
-        isLoading = true;
-        if(isLoading){
-            taskList.innerHTML = '<li class="loading">Loading tasks...</li>';
-        }
-
-        const filteredTasks =
-            filter === 'all'
-                ? allTasks
-                : allTasks.filter(task => task.status === filter);
-        
-        isLoading = false;
-        renderTasks(filteredTasks);
+        currentFilter = span.dataset.content;
+        applyFilterAndRender();
     });
 });
-
